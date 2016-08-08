@@ -10,3 +10,11 @@ Each chunk file contains around 500 documents.
 
 A manifest file is a text file that contains on each line fully specified system paths to each chunk file
 
+## Obtaining a test corpus
+
+Clone experiment branch https://github.com/BitFunnel/BitFunnel/tree/experiment and run:
+```
+make &&./StatisticsBuilder <manifest filepath>
+```
+The result are two $ separated csv files (they are not comma separated because some terms contain commas in the string of a posting, connfusing the reader).
+
