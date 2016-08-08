@@ -3,7 +3,7 @@
 
 # needs to be modified for particular path of the
 # directory
-base_dir = "/Users/admin/src/RabBIT/wiki-chunks/"
+base_dir = "/Users/admin/downloads/wiki-chunks/"
 
 dirs = c("AA", "AB", "AC", "AD");
 
