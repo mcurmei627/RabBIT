@@ -16,5 +16,5 @@ Clone experiment branch https://github.com/BitFunnel/BitFunnel/tree/experiment a
 ```
 make &&./StatisticsBuilder <manifest filepath>
 ```
-The result are two $ separated csv files (they are not comma separated because some terms contain commas in the string of a posting, connfusing the reader).
+The result are two $ separated csv files (they are not comma separated because some terms contain commas in the string of a posting, confusing the reader).
 
