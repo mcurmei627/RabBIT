@@ -68,14 +68,80 @@ count_cache_misses = function(table) {
 
 # given a term table returns the ratio between nr of cache misses
 # when using linear vs random (multiple terms)
-linear_vs_random = function(table) {
+linear_vs_random = function(table, verbose = getOption(TRUE, FALSE)) {
 
-  cache_misses1 = mean(count_cache_misses(table)) # <- linear procedure
+  # returns an array with the number of misses per cache line
+  cache_misses1 = count_cache_misses(table) # <- linear procedure
 
   K = nrow(table)
   r_order = sample(1:K)
   r_table = table[r_order,] # <- randomize the table
-  cache_misses2 = mean(count_cache_misses(r_table)) # <- random procedure
+  cache_misses2 = count_cache_misses(r_table) # <- random procedure
 
-  return(cache_misses1/cache_misses2)
+  ratio = mean(cache_misses1)/mean(cache_misses2)
+  if (verbose == FALSE) {
+    return(ratio)
+  }
+  print("The linear approach has on average ")
+  print(ratio)
+  print(" times more cache misses than the randomized approach")
+  p1 = qplot(cache_misses1, geom="histogram",
+        main = "Linear intersections",
+        xlab = "Number of cache misses per cache line",
+        fill = I("blue"),
+        col = I("red"))
+
+  p2 = qplot(cache_misses2, geom="histogram",
+        main = "Random intersections",
+        xlab = "Number of cache misses per cache line",
+        fill = I("blue"),
+        col = I("red"))
+  multiplot(p1, p2, cols = 1)
 }
+
+# Multiple plot function
+#
+# ggplot objects can be passed in ..., or to plotlist (as a list of ggplot objects)
+# - cols:   Number of columns in layout
+# - layout: A matrix specifying the layout. If present, 'cols' is ignored.
+#
+# If the layout is something like matrix(c(1,2,3,3), nrow=2, byrow=TRUE),
+# then plot 1 will go in the upper left, 2 will go in the upper right, and
+# 3 will go all the way across the bottom.
+#
+multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
+  library(grid)
+
+  # Make a list from the ... arguments and plotlist
+  plots <- c(list(...), plotlist)
+
+  numPlots = length(plots)
+
+  # If layout is NULL, then use 'cols' to determine layout
+  if (is.null(layout)) {
+    # Make the panel
+    # ncol: Number of columns of plots
+    # nrow: Number of rows needed, calculated from # of cols
+    layout <- matrix(seq(1, cols * ceiling(numPlots/cols)),
+                     ncol = cols, nrow = ceiling(numPlots/cols))
+  }
+
+  if (numPlots==1) {
+    print(plots[[1]])
+
+  } else {
+    # Set up the page
+    grid.newpage()
+    pushViewport(viewport(layout = grid.layout(nrow(layout), ncol(layout))))
+
+    # Make each plot, in the correct location
+    for (i in 1:numPlots) {
+      # Get the i,j matrix positions of the regions that contain this subplot
+      matchidx <- as.data.frame(which(layout == i, arr.ind = TRUE))
+
+      print(plots[[i]], vp = viewport(layout.pos.row = matchidx$row,
+                                      layout.pos.col = matchidx$col))
+    }
+  }
+}
+
